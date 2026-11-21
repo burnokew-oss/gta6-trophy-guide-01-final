@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leonida Ledger — GTA VI Trophy Guide &amp; Tracker</title>
+<style>
+  :root{
+    --paper:#f7f2e7; --card:#fffdf6; --ink:#20241d; --muted:#6b6a5e;
+    --pine:#1e5c46; --pine-soft:#e3efe6; --line:#ddd3bd; --gold:#a07d1c;
+    --silver:#5f6d7a; --bronze:#96622f; --plat:#3c5a78; --warn:#9a4a12;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:Georgia,'Iowan Old Style','Times New Roman',serif;}
+  header{padding:14px 22px 10px;border-bottom:3px double var(--pine);
+    display:flex;flex-wrap:wrap;gap:8px 22px;align-items:baseline;background:var(--card)}
+  header h1{margin:0;font-size:30px;letter-spacing:.5px;color:var(--pine)}
+  header .sub{color:var(--muted);font-size:14px;font-style:italic}
+  header .big{margin-left:auto;font-size:15px}
+  header .big b{font-size:26px;color:var(--pine)}
+  nav{display:flex;gap:6px;padding:8px 22px 0;flex-wrap:wrap}
+  nav button,.chip{font:inherit;font-size:13.5px;padding:5px 12px;border:1px solid var(--line);
+    background:var(--card);border-radius:999px;cursor:pointer;color:var(--ink)}
+  nav button.on,.chip.on{background:var(--pine);color:#fff;border-color:var(--pine)}
+  .audit{margin:10px 22px 0;padding:8px 14px;background:var(--pine-soft);
+    border:1px solid var(--line);border-radius:8px;font-size:13.5px;line-height:1.55}
+  .audit b{color:var(--pine)}
+  .bar{margin:8px 22px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13.5px}
+  .bar select,.bar input{font:inherit;font-size:13.5px;padding:4px 8px;border:1px solid var(--line);
+    border-radius:6px;background:var(--card);color:var(--ink)}
+  .bar label{display:flex;gap:5px;align-items:center}
+  main{padding:12px 22px 30px}
+  .cols{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(300px,1fr);gap:16px;align-items:start}
+  table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line)}
+  th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;font-size:14px}
+  th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+  tr.done td{background:#f1f6ee}
+  tr.sel td{background:var(--pine-soft)}
+  tbody tr{cursor:pointer}
+  .pbar{height:8px;background:#e7dfc9;border-radius:99px;margin:0 22px;overflow:hidden}
+  .pbar i{display:block;height:100%;background:var(--pine);width:0}
+  .grade{font-size:11.5px;font-weight:bold;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+  .g-platinum{color:var(--plat)} .g-gold{color:var(--gold)} .g-silver{color:var(--silver)} .g-bronze{color:var(--bronze)}
+  .name{font-weight:bold}
+  .desc{color:var(--muted);font-size:13px}
+  .tags{font-size:11.5px;color:var(--muted)}
+  .tag-miss{color:var(--warn);font-weight:bold}
+  .pane{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;position:sticky;top:10px}
+  .pane h2{margin:0 0 4px;font-size:21px;color:var(--pine)}
+  .pane h3{margin:14px 0 4px;font-size:15px;color:var(--pine)}
+  .pane p{font-size:14px;line-height:1.55;margin:6px 0}
+  .pane .src{font-size:12.5px;color:var(--muted);line-height:1.6}
+  .stage{border-left:4px solid var(--pine);padding:6px 12px;margin:10px 0;background:var(--card)}
+  .stage h3{margin:0;font-size:17px}
+  .hidden-note{font-style:italic;color:var(--muted)}
+  footer{padding:10px 22px 22px;color:var(--muted);font-size:12.5px;line-height:1.6}
+  @media (max-width:900px){.cols{grid-template-columns:1fr}.pane{position:static}}
+</style>
+</head>
+<body>
+<header>
+  <h1>Leonida Ledger</h1>
+  <span class="sub">The GTA VI trophy guide &amp; tracker — all 55 PlayStation 5 trophies, offline, in your own ledger.</span>
+  <span class="big"><b id="earnedCount">0</b> / 55 earned · <span id="pct">0%</span> to platinum</span>
+</header>
+<nav id="viewNav">
+  <button data-view="checklist" class="on">Checklist &amp; guides</button>
+  <button data-view="roadmap">Roadmap to platinum</button>
+  <button data-view="missables">Missable watch-list</button>
+</nav>
+<div class="pbar" title="Progress to platinum"><i id="progressFill"></i></div>
+<div class="audit" id="auditStrip">Loading the ledger…</div>
+<div class="bar" id="filterBar">
+  <label>Kind <select id="fKind">
+    <option value="">All kinds</option><option value="story">Story</option>
+    <option value="side">Side strands</option><option value="collectible">Collectibles</option>
+    <option value="activity">Activities</option><option value="feat">Feats</option>
+    <option value="completion">Completion</option><option value="platinum">Platinum</option>
+  </select></label>
+  <label>Grade <select id="fGrade">
+    <option value="">All grades</option><option>platinum</option><option>gold</option>
+    <option>silver</option><option>bronze</option>
+  </select></label>
+  <label>Status <select id="fStatus">
+    <option value="">All</option><option value="todo">Not earned</option><option value="done">Earned</option>
+  </select></label>
+  <input id="fSearch" type="search" placeholder="Search trophies…" size="18">
+  <label><input type="checkbox" id="fSpoiler" checked> Spoiler guard: hide story trophies until earned</label>
+  <button class="chip" id="btnExport">Export progress</button>
+  <label class="chip" for="importFile" style="cursor:pointer">Import progress</label>
+  <input id="importFile" type="file" accept="application/json" hidden>
+  <button class="chip" id="btnReset">Reset</button>
+</div>
+<main>
+  <section id="view-checklist" class="cols">
+    <table>
+      <thead><tr><th>✓</th><th>Trophy (official name &amp; description)</th><th>Grade</th><th>Kind</th><th>Missable</th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table>
+    <aside class="pane" id="guidePane">
+      <h2>Pick a trophy</h2>
+      <p>Select any row to read its guide here: what to do, where and how, when it can be missed, and the numbered sources it cites. Your checklist is saved in this browser automatically.</p>
+      <h3>How this ledger works</h3>
+      <p>Names, descriptions and grades are the official PlayStation ones. Every guide is written for this ledger in its own words and cites its sources by number. Missable flags use honest tiers: <b>none</b>, <b>watch</b> (finish before the endgame to be safe) and <b>possible</b> (a published warning exists).</p>
+    </aside>
+  </section>
+  <section id="view-roadmap" hidden>
+    <div id="roadmapBody"></div>
+  </section>
+  <section id="view-missables" hidden>
+    <div id="missBody"></div>
+  </section>
+</main>
+<footer id="srcFooter"></footer>
+<script>
+const LS_KEY = 'leonida-ledger-progress-v1';
+let DATA = null;
+let earned = new Set(JSON.parse(localStorage.getItem(LS_KEY) || '[]'));
+let selectedId = null;
+
+function saveProgress(){ localStorage.setItem(LS_KEY, JSON.stringify([...earned])); }
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function spoilerOn(){ return document.getElementById('fSpoiler').checked; }
+function shownName(t){
+  if (spoilerOn() && t.kind === 'story' && !earned.has(t.id)) return 'Hidden story trophy';
+  return t.name;
+}
+function shownDesc(t){
+  if (spoilerOn() && t.kind === 'story' && !earned.has(t.id)) return 'Hidden until earned — spoiler guard is on.';
+  return t.description;
+}
+function counts(){
+  const c = { total: DATA.trophies.length, platinum:0, gold:0, silver:0, bronze:0, hidden:0,
+    missWatch:0, missPossible:0, guided:0 };
+  for (const t of DATA.trophies){
+    c[t.grade]++; if (t.hidden) c.hidden++;
+    if (t.missable === 'watch') c.missWatch++;
+    if (t.missable === 'possible') c.missPossible++;
+    if (t.guide && t.guide.trim().length > 40) c.guided++;
+  }
+  return c;
+}
+function renderAudit(){
+  const c = counts();
+  document.getElementById('auditStrip').innerHTML =
+    '<b>Ledger audit (computed from the data file):</b> ' + c.total + ' trophies — ' +
+    c.platinum + ' platinum · ' + c.gold + ' gold · ' + c.silver + ' silver · ' + c.bronze + ' bronze · ' +
+    c.hidden + ' hidden on PlayStation · missable: ' + c.missPossible + ' possible, ' + c.missWatch +
+    ' on the watch tier, the rest safe · guides written &amp; cited for ' + c.guided + ' of ' + c.total + '.';
+  document.getElementById('earnedCount').textContent = earned.size;
+  document.getElementById('pct').textContent = Math.round(earned.size / c.total * 100) + '%';
+  document.getElementById('progressFill').style.width = (earned.size / c.total * 100) + '%';
+}
+function renderRows(){
+  const kind = document.getElementById('fKind').value;
+  const grade = document.getElementById('fGrade').value;
+  const status = document.getElementById('fStatus').value;
+  const q = document.getElementById('fSearch').value.trim().toLowerCase();
+  const body = document.getElementById('rows');
+  body.innerHTML = '';
+  for (const t of DATA.trophies){
+    if (kind && t.kind !== kind) continue;
+    if (grade && t.grade !== grade) continue;
+    if (status === 'done' && !earned.has(t.id)) continue;
+    if (status === 'todo' && earned.has(t.id)) continue;
+    if (q && !(t.name + ' ' + t.description).toLowerCase().includes(q)) continue;
+    const tr = document.createElement('tr');
+    if (earned.has(t.id)) tr.className = 'done';
+    if (selectedId === t.id) tr.classList.add('sel');
+    const miss = t.missable === 'none' ? '<span class="tags">safe</span>'
+      : '<span class="tag-miss">' + t.missable + '</span>';
+    tr.innerHTML =
+      '<td><input type="checkbox" data-id="' + t.id + '"' + (earned.has(t.id) ? ' checked' : '') + '></td>' +
+      '<td><span class="name">' + esc(shownName(t)) + '</span><br><span class="desc">' + esc(shownDesc(t)) + '</span>' +
+      (t.target ? '<br><span class="tags">PlayStation tracks: ' + t.target + '</span>' : '') +
+      (t.hidden ? '<br><span class="tags">hidden on PSN</span>' : '') + '</td>' +
+      '<td><span class="grade g-' + t.grade + '">' + t.grade + '</span></td>' +
+      '<td class="tags">' + t.kind + '</td><td>' + miss + '</td>';
+    tr.addEventListener('click', ev => { if (ev.target.type !== 'checkbox') showGuide(t.id); });
+    body.appendChild(tr);
+  }
+  body.querySelectorAll('input[type=checkbox]').forEach(cb => cb.addEventListener('change', () => {
+    const id = Number(cb.dataset.id);
+    if (cb.checked) earned.add(id); else earned.delete(id);
+    saveProgress(); renderAudit(); renderRows(); if (selectedId === id) showGuide(id);
+  }));
+}
+function showGuide(id){
+  selectedId = id;
+  renderRows();
+  const t = DATA.trophies.find(x => x.id === id);
+  const pane = document.getElementById('guidePane');
+  pane.innerHTML =
+    '<h2>' + esc(shownName(t)) + '</h2>' +
+    '<p><span class="grade g-' + t.grade + '">' + t.grade + '</span> · ' + t.kind +
+    (t.hidden ? ' · hidden on PSN' : '') + (t.target ? ' · PlayStation tracks ' + t.target : '') + '</p>' +
+    '<p><i>Official description:</i> ' + esc(shownDesc(t)) + '</p>' +
+    '<h3>Guide (our own words)</h3><p>' + esc(t.guide) + '</p>' +
+    '<h3>Missable — tier: ' + t.missable + '</h3><p>' + esc(t.missableNote) + '</p>' +
+    '<h3>Roadmap stage</h3><p>Stage ' + t.stage + ' of the roadmap to platinum (see the Roadmap tab).</p>' +
+    '<h3>Sources cited</h3><p class="src">' + DATA.sources.map(s =>
+      '[' + s.n + '] ' + esc(s.name) + ' — ' + esc(s.usedFor)).join('<br>') + '</p>';
+}
+const STAGES = [
+  { n: 1, title: 'Stage 1 — Story first (Chapters 1–4 and the finale)', hours: '≈ 25–35 hours',
+    text: 'Play the campaign straight through. Every chapter, named-mission and finale trophy is automatic and none can be skipped. Meditate at any spot you pass (see the watch-list) and sample one of each activity type as they unlock.' },
+  { n: 2, title: 'Stage 2 — Strands, samples and small counts', hours: '≈ 8–12 hours',
+    text: 'Finish the stranger strands (Andy, Kenton, Billy, Randy, Tyrone, Bret) before leaning on post-game, beat Cal at fishing, finish one arcade game, bowl at Kolt & Associates, take the Ocean Beach cocktail, and register 10 vehicles to Scooter Bros.' },
+  { n: 3, title: 'Stage 3 — Activities and feats in free roam', hours: '≈ 15–25 hours',
+    text: 'The skill grinds: 250 stunts, gold in all 42 Shooting Range challenges, drone race wins at 14 locations, 20 different race wins, 50 challenges, plus the partner and robbery feats — vaults, armored trucks, jewelry store, one illegal operation per gang.' },
+  { n: 4, title: 'Stage 4 — Collectibles, exploration and money', hours: '≈ 15–25 hours',
+    text: 'Sweep the map: 3 card sets, 100 WAiNK locations, 100 vehicles discovered, all 52 areas explored, $250,000 laundered, $100,000 spent, all 8 garages bought, and the 500 tracked choices. This stage completes the 100% checklist for A Long Road.' },
+  { n: 5, title: 'Stage 5 — The platinum', hours: '—',
+    text: 'When the other 54 are earned, Vice Got a Price! is awarded automatically. Total estimate for the full ledger: roughly 65–95 hours, built from the official descriptions and the stage timings of the cited roadmaps [3][6].' },
+];
+function renderRoadmap(){
+  const el = document.getElementById('roadmapBody');
+  el.innerHTML = '<h2 style="color:var(--pine);margin:4px 0">Roadmap to the platinum</h2>' +
+    '<p style="max-width:70ch;font-size:14.5px;line-height:1.55">Built from the official descriptions: story first (nothing there can be missed), strands while contacts are guaranteed, then the free-roam grinds, then the map-wide cleanup that also finishes the 100% checklist. Your earned count per stage updates live.</p>' +
+    STAGES.map(s => {
+      const inStage = DATA.trophies.filter(t => t.stage === s.n);
+      const got = inStage.filter(t => earned.has(t.id)).length;
+      return '<div class="stage"><h3>' + s.title + '</h3><p style="font-size:14px;line-height:1.55;margin:4px 0">' +
+        s.text + '</p><p class="tags">Estimate: ' + s.hours + ' · Progress: ' + got + ' / ' + inStage.length +
+        ' earned · ' + inStage.map(t => esc(t.name)).join(' · ') + '</p></div>';
+    }).join('');
+}
+function renderMissables(){
+  const el = document.getElementById('missBody');
+  const flagged = DATA.trophies.filter(t => t.missable !== 'none');
+  el.innerHTML = '<h2 style="color:var(--pine);margin:4px 0">Missable watch-list — honest tiers</h2>' +
+    '<p style="max-width:70ch;font-size:14.5px;line-height:1.55">No trophy on the official list is confirmed permanently missable. This ledger says so plainly and uses two caution tiers instead of fake alarms: <b>possible</b> (a published guide warning exists) and <b>watch</b> (strand work that is safest finished before the finale). Everything else is flagged safe.</p>' +
+    flagged.map(t => '<div class="stage"><h3>' + esc(t.name) + ' — <span class="tag-miss">' + t.missable + '</span></h3>' +
+      '<p style="font-size:14px;line-height:1.55;margin:4px 0">' + esc(t.missableNote) + '</p>' +
+      '<p style="font-size:14px;line-height:1.55;margin:4px 0">' + esc(t.guide) + '</p></div>').join('');
+}
+function exportProgress(){
+  const blob = new Blob([JSON.stringify({ app: 'leonida-ledger', earned: [...earned] }, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'leonida-ledger-progress.json'; a.click();
+  URL.revokeObjectURL(a.href);
+}
+function importProgress(file){
+  file.text().then(txt => {
+    const parsed = JSON.parse(txt);
+    const list = Array.isArray(parsed) ? parsed : parsed.earned;
+    earned = new Set(list.map(Number).filter(id => DATA.trophies.some(t => t.id === id)));
+    saveProgress(); renderAudit(); renderRows(); renderRoadmap();
+  }).catch(() => alert('That file is not a Leonida Ledger progress export.'));
+}
+function setView(view){
+  document.querySelectorAll('#viewNav button').forEach(b => b.classList.toggle('on', b.dataset.view === view));
+  document.getElementById('view-checklist').hidden = view !== 'checklist';
+  document.getElementById('view-roadmap').hidden = view !== 'roadmap';
+  document.getElementById('view-missables').hidden = view !== 'missables';
+  document.getElementById('filterBar').style.display = view === 'checklist' ? '' : 'none';
+  if (view === 'roadmap') renderRoadmap();
+  if (view === 'missables') renderMissables();
+}
+async function boot(){
+  const res = await fetch('data/trophies.json');
+  DATA = await res.json();
+  renderAudit(); renderRows();
+  document.getElementById('srcFooter').innerHTML =
+    '<b>Sources.</b> ' + DATA.sources.map(s => '[' + s.n + '] ' + esc(s.name) + ' (' + esc(s.url) + ') — ' + esc(s.usedFor)).join(' ') +
+    '<br>Official names, descriptions and grades are PlayStation\u2019s, shown as published. All guide text is this ledger\u2019s own words. No Rockstar logo or artwork is used. Works fully offline; progress lives only in your browser.';
+  for (const id of ['fKind','fGrade','fStatus']) document.getElementById(id).addEventListener('change', renderRows);
+  document.getElementById('fSearch').addEventListener('input', renderRows);
+  document.getElementById('fSpoiler').addEventListener('change', () => { renderRows(); if (selectedId) showGuide(selectedId); });
+  document.getElementById('btnExport').addEventListener('click', exportProgress);
+  document.getElementById('btnReset').addEventListener('click', () => { earned.clear(); saveProgress(); renderAudit(); renderRows(); });
+  document.getElementById('importFile').addEventListener('change', ev => { if (ev.target.files[0]) importProgress(ev.target.files[0]); });
+  document.querySelectorAll('#viewNav button').forEach(b => b.addEventListener('click', () => setView(b.dataset.view)));
+  const wanted = new URLSearchParams(location.search).get('view');
+  if (wanted === 'roadmap' || wanted === 'missables') setView(wanted);
+  const sel = Number(new URLSearchParams(location.search).get('trophy'));
+  if (sel && DATA.trophies.some(t => t.id === sel)) showGuide(sel);
+}
+boot();
+</script>
+</body>
+</html>
